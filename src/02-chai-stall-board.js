@@ -65,17 +65,41 @@
  *   // => "cutting" (cheapest chai gets "cheapest" class)
  */
 export function updateChaiPrice(document, chaiType, newPrice) {
-  // Your code here
+  if (typeof newPrice !== "number" || newPrice <= 0 || typeof chaiType !== "string" || chaiType === "") return false
+  let target = document.getElementById(`price-${chaiType}`)
+  if (!target) return false
+  target.textContent = `₹${newPrice}`
+  return true
 }
 
 export function getChaiPrice(document, chaiType) {
-  // Your code here
+  let target = document.getElementById(`price-${chaiType}`)
+  if (!target) return null
+  let price = parseFloat(target.textContent.slice(1))
+  target.textContent = price
+  return price
 }
 
 export function updateStallName(document, newName) {
-  // Your code here
+  if (typeof newName !== "string" || newName === "") return null
+  let target = document.querySelector(".stall-name")
+  if (!target) return null
+  let oldText = target.textContent
+  target.textContent = newName
+  return oldText
 }
 
 export function highlightCheapestChai(document) {
-  // Your code here
+  let allElements = Array.from(document.querySelectorAll(".chai-price"))
+  if (allElements.length === 0) return null
+
+  let target = allElements.reduce((acc, curr) => {
+    acc.price = parseFloat(acc.textContent.slice(1))
+    curr.price = parseFloat(curr.textContent.slice(1))
+    return acc.price < curr.price ? acc : curr
+  })
+
+  allElements.forEach(Element => Element !== target ? Element.classList.remove("cheapest") : target.classList.add("cheapest"))
+
+  return target.getAttribute('data-chai')
 }

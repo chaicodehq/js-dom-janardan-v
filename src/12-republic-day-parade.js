@@ -111,9 +111,108 @@
  *   // => true
  */
 export function createContingent(name, type, state, members) {
-  // Your code here
+  if (!name || !type || !state || !members || typeof name !== "string" || typeof type !== "string" || typeof state !== "string" || !Array.isArray(members)) return null
+  let div = document.createElement("div")
+  div.classList.add("contingent")
+  div.dataset.name = name
+  div.dataset.state = state
+  div.dataset.type = type
+
+  let head = document.createElement('h3')
+  head.textContent = name
+
+  let typeSpan = document.createElement('span')
+  typeSpan.classList.add("type")
+  typeSpan.textContent = type
+
+  let stateSpan = document.createElement('span')
+  stateSpan.classList.add("state")
+  stateSpan.textContent = state
+
+  let list = document.createElement("ul")
+  members.forEach(member => {
+    let li = document.createElement('li')
+    li.textContent = member
+    list.appendChild(li)
+  })
+
+  div.appendChild(head)
+  div.appendChild(typeSpan)
+  div.appendChild(stateSpan)
+  div.appendChild(list)
+
+  return div
 }
 
 export function setupParadeDashboard(container) {
-  // Your code here
+  if (!container) return null
+  return {
+    addContingent(contingent) {
+      let { name, type, state, members } = contingent
+      let element = createContingent(name, type, state, members)
+      if (element) {
+        container.appendChild(element)
+        return element
+      }
+      return null
+    },
+    removeContingent(name) {
+      let contingents = Array.from(container.querySelectorAll(".contingent"))
+      for (const contingent of contingents) {
+        if (contingent.dataset.name === name) {
+          container.removeChild(contingent)
+          return true
+        }
+      }
+      return false
+    },
+    moveContingent(name, direction) {
+      if (!name) return false
+      let target = Array.from(container.querySelectorAll(".contingent")).find(cont => cont.dataset.name === name)
+      if (!target) return false
+      let parent = target.parentNode
+      switch (direction) {
+        case "up":
+          let prev = target.previousElementSibling
+          if (!prev) return false
+          parent.insertBefore(target, prev)
+          return true
+
+        case "down":
+          let next = target.nextElementSibling
+          if (!next) return false
+          parent.insertBefore(next, target)
+          return true
+        default:
+          return false
+      }
+    },
+    getContingentsByType(type) {
+      return Array.from(container.querySelectorAll(".contingent")).filter(cont => cont.dataset.type === type)
+    },
+    highlightState(state) {
+      let count = 0
+      Array.from(container.querySelectorAll(".contingent")).forEach(cont => {
+        if (cont.dataset.state === state) {
+          cont.classList.add("highlight")
+          count++
+        } else {
+          cont.classList.remove("highlight")
+        }
+      })
+      return count
+    },
+    getParadeOrder() {
+      let result = []
+      let contArray = Array.from(container.querySelectorAll(".contingent"))
+      contArray.map(cont => result.push(cont.dataset.name))
+      return result
+    },
+    getTotalMembers() {
+      let liCount = 0
+      let contArray = Array.from(container.querySelectorAll(".contingent"))
+      contArray.forEach(cont => liCount += cont.querySelectorAll("li").length)
+      return liCount
+    }
+  }
 }

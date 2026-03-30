@@ -79,21 +79,96 @@
  *   // => 1 (only red kites shown)
  */
 export function renderKiteCard(kite) {
-  // Your code here
+  if (!kite || !kite.name || !kite.color || !kite.size || !kite.maker || !kite.image) return null
+  let { name, color, size, maker, image } = kite
+
+  let div = document.createElement('div')
+  div.classList.add("kite-card")
+
+  let img = document.createElement('img')
+  img.setAttribute("src", image)
+  img.setAttribute("alt", name)
+
+  let head = document.createElement("h3")
+  head.classList.add("kite-name")
+  head.textContent = name
+
+  let makedBy = document.createElement("p")
+  makedBy.classList.add("kite-maker")
+  makedBy.textContent = `by ${maker}`
+
+  let info = document.createElement("p")
+  info.classList.add("kite-info")
+  info.textContent = `${size} - ${color}`
+
+  div.appendChild(img)
+  div.appendChild(head)
+  div.appendChild(makedBy)
+  div.appendChild(info)
+
+  return div
+
 }
 
 export function renderGallery(container, kites) {
-  // Your code here
+  if (!container || !Array.isArray(kites)) return -1
+  container.innerHTML = ""
+  let count = 0
+  kites.forEach(kite => {
+    const renderResult = renderKiteCard(kite)
+    if (renderResult) {
+      container.appendChild(renderResult)
+      count++
+    }
+  });
+  return count
 }
 
 export function filterKites(container, kites, filterFn) {
-  // Your code here
+  if (!container || !Array.isArray(kites) || typeof filterFn !== "function") return -1
+  let count = 0
+  kites.forEach(kite => {
+    if (filterFn(kite)) {
+      container.appendChild(renderKiteCard(kite))
+      count++
+    }
+  })
+
+  return count
 }
 
 export function sortAndRender(container, kites, sortField, order) {
-  // Your code here
+  if (!container || !Array.isArray(kites)) return []
+  let newKites = [...kites]
+  if (!order) order = "asc"
+
+  const comparator = (a, b) => {
+    if (a > b) return 1
+    if (a < b) return -1
+    return 0
+  }
+
+  if (order === 'desc') {
+    newKites.sort((a, b) => comparator(b[sortField], a[sortField]))
+  } else if (order === 'asc') {
+    newKites.sort((a, b) => comparator(a[sortField], b[sortField]))
+  }
+  container.innerHTML = ""
+  newKites.forEach(kite => container.appendChild(renderKiteCard(kite)))
+
+  return newKites
 }
 
 export function renderEmptyState(container, message) {
-  // Your code here
+  if (!container) return false
+
+  if(!container.childElementCount){
+    let para = document.createElement("p")
+    para.classList.add("empty-state")
+    para.textContent = message
+
+    container.appendChild(para)
+    return true
+  }
+  return false
 }
